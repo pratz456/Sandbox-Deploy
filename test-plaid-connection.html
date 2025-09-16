@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Plaid Connection</title>
+</head>
+<body>
+    <h1>Plaid Connection Test</h1>
+    <button onclick="testAuth()">Test Firebase Auth</button>
+    <button onclick="testPlaidAPI()">Test Plaid API Call</button>
+    
+    <div id="results"></div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+        // Your Firebase config (from your .env.local)
+        const firebaseConfig = {
+            apiKey: "AIzaSyCVvpY-M571W0I3Faz-i8mAyofLobqm5ZE",
+            authDomain: "writeoff-23910.firebaseapp.com",
+            projectId: "writeoff-23910",
+            storageBucket: "writeoff-23910.appspot.com",
+            messagingSenderId: "930596534802",
+            appId: "1:930596534802:web:e4c7c12ead77a9d92336cb"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        window.testAuth = async function() {
+            const results = document.getElementById('results');
+            
+            onAuthStateChanged(auth, async (user) => {
+                if (user) {
+                    try {
+                        const token = await user.getIdToken();
+                        results.innerHTML += `<p>✅ Firebase Auth: User ${user.uid}</p>`;
+                        results.innerHTML += `<p>🔑 Token length: ${token.length}</p>`;
+                        
+                        // Test API auth
+                        const response = await fetch('/api/transactions', {
+                            headers: {
+                                'Authorization': `Bearer ${token}`,
+                                'Content-Type': 'application/json',
+                            },
+                        });
+                        
+                        const data = await response.json();
+                        results.innerHTML += `<p>📡 API Response: ${response.status} - ${JSON.stringify(data)}</p>`;
+                        
+                    } catch (error) {
+                        results.innerHTML += `<p>❌ Error: ${error.message}</p>`;
+                    }
+                } else {
+                    results.innerHTML += `<p>❌ No Firebase user found - please sign in first</p>`;
+                }
+            });
+        }
+
+        window.testPlaidAPI = async function() {
+            const results = document.getElementById('results');
+            
+            if (!auth.currentUser) {
+                results.innerHTML += `<p>❌ Please test auth first</p>`;
+                return;
+            }
+
+            try {
+                const token = await auth.currentUser.getIdToken();
+                
+                // Test with a dummy public token (this will fail but show us where)
+                const response = await fetch('/api/plaid/exchange-public-token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        public_token: 'public-sandbox-test-token'
+                    }),
+                });
+                
+                const data = await response.json();
+                results.innerHTML += `<p>🔄 Plaid API Response: ${response.status} - ${JSON.stringify(data)}</p>`;
+                
+            } catch (error) {
+                results.innerHTML += `<p>❌ Plaid API Error: ${error.message}</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
+
+

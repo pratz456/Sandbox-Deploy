@@ -1,0 +1,50 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Analysis Jobs - for tracking analysis progress (new system)
+    match /analysis_jobs/{jobId} {
+      allow read: if request.auth != null
+                  && resource.data.userId == request.auth.uid;
+      allow write: if false; // only server updates this
+    }
+
+    // Analysis Status - legacy (for migration)
+    match /analysis_status/{jobId} {
+      // TEMP during migration - allow both userId and user_id fields
+      allow read: if request.auth != null
+                  && (resource.data.userId == request.auth.uid
+                      || resource.data.user_id == request.auth.uid);
+      allow write: if false; // clients never write; server uses Admin SDK
+    }
+
+    // User profile can only be read by the owner, written via Admin/API only
+    match /user_profiles/{uid} {
+      allow read: if request.auth != null && request.auth.uid == uid;
+      allow write: if false; // write via Admin/API only
+
+      // Accounts subcollection
+      match /accounts/{accountId} {
+        allow read: if request.auth != null && request.auth.uid == uid;
+        allow write: if false; // write via Admin/API only
+        
+        // Transactions
+        match /transactions/{txId} {
+          // Allow reading transactions
+          allow read: if request.auth != null && request.auth.uid == uid;
+          
+          // Allow user updates to specific fields only
+          allow update: if request.auth != null
+                        && request.auth.uid == uid
+                        && request.resource.data.diff(resource.data).changedKeys().hasAny([
+                             'userLabel', 'notes', 'receiptUrl', 'user_classification_reason'
+                           ]);
+          
+          // Prevent arbitrary creates/deletes from client
+          // Server-side analysis updates use Admin SDK (bypasses these rules)
+          allow create, delete: if false;
+        }
+      }
+    }
+  }
+}
