@@ -1,0 +1,49 @@
+# ===========================================
+# VERCEL DEPLOYMENT ENVIRONMENT VARIABLES
+# ===========================================
+# Add these variables to your Vercel project settings
+# Go to: Project Settings > Environment Variables
+
+# ===========================================
+# FIREBASE CONFIGURATION (Client-side)
+# ===========================================
+# These are public and will be exposed to the browser
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key_here
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id_here
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id_here
+NEXT_PUBLIC_FIREBASE_APP_ID=your_firebase_app_id_here
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=your_measurement_id_here
+
+# ===========================================
+# FIREBASE ADMIN (Server-side)
+# ===========================================
+# These are private and only used on the server
+FIREBASE_ADMIN_PROJECT_ID=your_project_id_here
+FIREBASE_ADMIN_CLIENT_EMAIL=your_service_account_email@your_project_id.iam.gserviceaccount.com
+FIREBASE_ADMIN_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\nYOUR_PRIVATE_KEY_HERE\n-----END PRIVATE KEY-----\n"
+
+# ===========================================
+# PLAID CONFIGURATION
+# ===========================================
+PLAID_ENV=sandbox
+PLAID_CLIENT_ID=your_plaid_client_id_here
+PLAID_SECRET=your_plaid_secret_here
+
+# ===========================================
+# OPENAI CONFIGURATION
+# ===========================================
+OPENAI_API_KEY=your_openai_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+
+# ===========================================
+# CUSTOM CONFIGURATION
+# ===========================================
+CUSTOM_KEY=your_custom_key_here
+
+# ===========================================
+# DEVELOPMENT SETTINGS
+# ===========================================
+# Uncomment for local development with Firebase emulator
+# USE_FIREBASE_EMULATOR=true
